@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+
+/* ============================================================
+   EDITABLE CONTENT lives in the DATA object near the top of the
+   <script> at the bottom of this file. Design/markup below never
+   needs to change to update text, sizes, dog info, etc.
+   ============================================================ */
+
+:root{
+  --ink:#0b0b0c;
+  --ink-2:#131315;
+  --text:#ece6da;
+  --text-dim:#9c948a;
+  --wine:#7a1f2b;
+  --wine-soft: rgba(122,31,43,0.14);
+  --gold:#ab8b5c;
+  --line: rgba(236,230,218,0.12);
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Inter', sans-serif;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--ink);
+  color:var(--text);
+  font-family:var(--font-sans);
+  font-weight:300;
+  min-height:100vh;
+}
+a{color:inherit;}
+::selection{ background:var(--wine); color:var(--text); }
+::-webkit-scrollbar{width:8px;}
+::-webkit-scrollbar-track{background:var(--ink);}
+::-webkit-scrollbar-thumb{background:#2a2a2c;}
+
+/* ---------------- Splash / entry screen ---------------- */
+#splash{
+  position:fixed; inset:0; z-index:10000;
+  background:#000 url('assets/splash.jpg') center center / cover no-repeat;
+  cursor:pointer;
+  display:flex; align-items:flex-end; justify-content:center;
+  transition:opacity 0.6s ease, visibility 0.6s ease;
+}
+#splash.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+#splash .tap-hint{
+  margin-bottom:7vh;
+  font-family:var(--font-sans);
+  font-size:10px;
+  letter-spacing:0.28em;
+  text-transform:uppercase;
+  color:#e8ddc8;
+  opacity:0.75;
+  animation:pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse{ 0%,100%{opacity:0.35;} 50%{opacity:0.85;} }
+
+/* ---------------- Header / nav ---------------- */
+header{
+  padding:36px 6vw 18px;
+  display:flex; align-items:baseline; justify-content:space-between;
+  flex-wrap:wrap; gap:14px;
+  max-width:1180px; margin:0 auto;
+}
+.wordmark{
+  font-family:var(--font-serif);
+  font-style:italic;
+  font-weight:500;
+  font-size:clamp(20px,2.4vw,26px);
+  letter-spacing:0.01em;
+  cursor:pointer;
+}
+.wordmark span{ color:var(--text-dim); font-style:normal; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; margin-left:12px; }
+
+nav.tabs{
+  display:flex; gap:28px; flex-wrap:wrap;
+  padding:0 6vw 30px;
+  max-width:1180px; margin:0 auto;
+  border-bottom:1px solid var(--line);
+}
+.tab{
+  background:none; border:none; cursor:pointer;
+  color:var(--text-dim);
+  font-family:var(--font-sans);
+  font-size:12px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  padding:0 0 14px;
+  position:relative;
+  transition:color 0.2s ease;
+}
+.tab::after{
+  content:""; position:absolute; left:0; right:0; bottom:-1px; height:1px;
+  background:var(--gold); transform:scaleX(0); transition:transform 0.25s ease;
+}
+.tab:hover{ color:var(--text); }
+.tab.active{ color:var(--text); }
+.tab.active::after{ transform:scaleX(1); }
+
+/* ---------------- Main stage ---------------- */
+main{
+  padding:8px 6vw 100px;
+  max-width:1180px;
+  margin:0 auto;
+}
+.panel{ display:none; animation:fadein 0.4s ease; }
+.panel.active{ display:block; }
+@keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+.eyebrow{
+  font-family:var(--font-sans);
+  font-size:11px;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:10px;
+}
+h1.page-title{
+  font-family:var(--font-serif);
+  font-weight:500;
+  font-size:clamp(32px,5vw,52px);
+  margin:0 0 8px;
+  line-height:1.05;
+}
+.page-sub{
+  color:var(--text-dim);
+  font-size:14px;
+  font-weight:300;
+  margin-bottom:44px;
+  max-width:560px;
+  line-height:1.6;
+}
+
+/* ---------------- HOME ---------------- */
+.hero{
+  padding:20px 0 56px;
+  border-bottom:1px solid var(--line);
+  margin-bottom:48px;
+}
+.hero h2{
+  font-family:var(--font-serif);
+  font-weight:500;
+  font-style:italic;
+  font-size:clamp(38px,7vw,72px);
+  margin:0 0 18px;
+  line-height:1.05;
+}
+.hero p{
+  color:var(--text-dim);
+  font-size:15px;
+  line-height:1.7;
+  max-width:480px;
+  font-weight:300;
+}
+
+.grid-3{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); }
+.doorway{
+  padding:28px 26px;
+  background:var(--ink);
+  cursor:pointer;
+  transition:background 0.2s ease;
+}
+.doorway:hover{ background:var(--ink-2); }
+.doorway .num{
+  font-family:var(--font-sans);
+  font-size:10px; color:var(--text-dim); letter-spacing:0.18em; text-transform:uppercase;
+}
+.doorway h3{
+  font-family:var(--font-serif); font-weight:500;
+  font-size:21px; margin:10px 0 8px;
+}
+.doorway p{ font-size:12.5px; color:var(--text-dim); margin:0; line-height:1.6; font-weight:300;}
+
+/* ---------------- Pin boards (wishlist / interiors) ---------------- */
+.pingrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:24px; }
+.pin{
+  border:1px solid var(--line);
+  background:var(--ink-2);
+  overflow:hidden;
+  position:relative;
+}
+.pin .pin-img{
+  width:100%; aspect-ratio:4/5;
+  background:#1a1a1c;
+  background-size:cover; background-position:center;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--text-dim); font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+}
+.pin .pin-body{ padding:16px 18px 20px; }
+.pin .pin-title{ font-family:var(--font-serif); font-size:17px; font-weight:500; line-height:1.3; }
+.pin .pin-desc{ font-size:12.5px; color:var(--text-dim); margin-top:6px; line-height:1.55; font-weight:300; }
+.pin a.pin-link{
+  display:inline-block; margin-top:12px; font-size:11px; letter-spacing:0.1em;
+  text-transform:uppercase; text-decoration:none; color:var(--gold);
+  border-bottom:1px solid transparent;
+}
+.pin a.pin-link:hover{ border-bottom-color:var(--gold); }
+.pin .pin-remove{
+  position:absolute; top:10px; right:10px;
+  width:24px; height:24px; border-radius:50%;
+  background:rgba(11,11,12,0.7); color:var(--text);
+  border:1px solid var(--line);
+  font-size:13px; line-height:1; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; transition:opacity 0.2s ease;
+}
+.pin:hover .pin-remove{ opacity:1; }
+
+.add-form{
+  border:1px solid var(--line);
+  padding:26px 28px;
+  margin-bottom:36px;
+}
+.add-form .eyebrow{ margin-bottom:16px; }
+.add-form .row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:14px;}
+.add-form label{
+  display:block; font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase;
+  color:var(--text-dim); margin-bottom:6px;
+}
+.add-form input[type=text], .add-form input[type=url], .add-form textarea, .add-form input[type=number]{
+  background:transparent; border:none; border-bottom:1px solid var(--line); color:var(--text);
+  font-family:var(--font-sans); font-weight:300; font-size:14px; padding:8px 2px; width:100%;
+}
+.add-form input:focus, .add-form textarea:focus{ outline:none; border-bottom-color:var(--gold); }
+.add-form textarea{ min-height:60px; resize:vertical; }
+.add-form input[type=file]{
+  font-size:12px; color:var(--text-dim); width:100%;
+}
+.thumb-preview{
+  width:70px; height:70px; object-fit:cover; margin-top:8px; border:1px solid var(--line); display:none;
+}
+.btn{
+  font-family:var(--font-sans); font-size:11px; letter-spacing:0.16em; text-transform:uppercase;
+  background:none; color:var(--text); border:1px solid var(--gold); padding:12px 26px; cursor:pointer;
+  transition:background 0.2s ease, color 0.2s ease;
+}
+.btn:hover{ background:var(--gold); color:var(--ink); }
+
+/* ---------------- ID card (Charles / handoff) ---------------- */
+.id-card{
+  border:1px solid var(--line);
+  margin-bottom:22px;
+}
+.id-card .id-head{
+  padding:16px 24px;
+  border-bottom:1px solid var(--line);
+  font-family:var(--font-serif);
+  font-size:16px;
+  display:flex; justify-content:space-between; align-items:baseline;
+  color:var(--text);
+}
+.id-card .id-head span:last-child{ font-family:var(--font-sans); font-size:11px; color:var(--text-dim); letter-spacing:0.05em; }
+.id-card .id-body{ padding:6px 24px; }
+.field-row{
+  display:grid; grid-template-columns:200px 1fr;
+  gap:14px;
+  padding:14px 0;
+  border-bottom:1px solid var(--line);
+  font-size:13.5px;
+}
+.field-row:last-child{ border-bottom:none; }
+.field-label{
+  font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--text-dim);
+}
+.field-value{ color:var(--text); font-weight:300; }
+.field-value.placeholder{ color:var(--text-dim); font-style:italic; }
+
+.note-line{
+  padding:16px 0;
+  font-size:13px;
+  color:var(--text-dim);
+  border-bottom:1px solid var(--line);
+  margin-bottom:16px;
+  font-style:italic;
+}
+
+/* ---------------- Health dashboard ---------------- */
+.stat-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:40px; }
+.stat-card{ background:var(--ink); padding:26px 24px; }
+.stat-card .stat-label{ font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-dim); margin-bottom:12px; }
+.stat-card input{
+  background:transparent; border:none; color:var(--text);
+  font-family:var(--font-serif); font-size:30px; font-weight:500; width:100%;
+  border-bottom:1px solid transparent; padding-bottom:6px;
+}
+.stat-card input:focus{ outline:none; border-bottom-color:var(--gold); }
+.stat-card .stat-unit{ font-size:11px; color:var(--text-dim); margin-top:4px; }
+
+.goals-box{
+  border:1px solid var(--line); padding:24px 26px; margin-bottom:40px;
+}
+.goals-box textarea{
+  width:100%; background:transparent; border:none; color:var(--text);
+  font-family:var(--font-sans); font-weight:300; font-size:14px; line-height:1.7;
+  min-height:100px; resize:vertical;
+}
+.goals-box textarea:focus{ outline:none; }
+
+.pr-row{
+  display:grid; grid-template-columns:1fr 1fr 120px 30px;
+  gap:14px; align-items:center;
+  padding:13px 0; border-bottom:1px solid var(--line); font-size:13.5px;
+}
+.pr-row .pr-date{ color:var(--text-dim); font-size:11px; }
+.pr-row .pr-remove{ cursor:pointer; color:var(--text-dim); text-align:right; font-size:12px; }
+.pr-row .pr-remove:hover{ color:var(--wine); }
+
+/* ---------------- Recipes ---------------- */
+.recipe-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); }
+.recipe-card{ background:var(--ink); }
+.recipe-card .rc-head{ padding:20px 22px 0; }
+.recipe-card .rc-head .num{ font-size:10px; color:var(--text-dim); letter-spacing:0.14em; text-transform:uppercase;}
+.recipe-card h3{ font-family:var(--font-serif); font-weight:500; margin:8px 0 0; font-size:21px;}
+.recipe-card .rc-body{ padding:14px 22px 22px; font-size:13px; color:var(--text-dim); line-height:1.7; white-space:pre-line; font-weight:300;}
+.recipe-card .rc-tag{
+  display:inline-block; font-size:10px; letter-spacing:0.1em;
+  color:var(--gold); margin-top:12px; text-transform:uppercase;
+}
+
+/* ---------------- Journal ---------------- */
+.lock-screen{
+  border:1px solid var(--line); max-width:400px; margin:60px auto; padding:48px 36px; text-align:center;
+}
+.lock-screen h2{ font-family:var(--font-serif); font-weight:500; font-style:italic; font-size:26px; margin:0 0 10px;}
+.lock-screen p{ font-size:12.5px; color:var(--text-dim); margin-bottom:24px; font-weight:300;}
+.lock-screen input{
+  width:100%; background:transparent; border:none; border-bottom:1px solid var(--line); color:var(--text);
+  padding:10px 0; font-family:var(--font-sans); text-align:center; letter-spacing:0.3em; margin-bottom:20px;
+}
+.lock-screen input:focus{ outline:none; border-bottom-color:var(--gold); }
+.lock-screen .err{ color:var(--wine); font-size:12px; height:16px; margin-top:10px; }
+
+.journal-composer{ border:1px solid var(--line); padding:26px 28px; margin-bottom:40px; }
+.journal-composer textarea{
+  width:100%; background:transparent; border:none; color:var(--text);
+  font-family:var(--font-sans); font-weight:300; font-size:14px; line-height:1.7;
+  min-height:90px; resize:vertical; border-bottom:1px solid var(--line); padding-bottom:14px; margin-bottom:16px;
+}
+.journal-composer textarea:focus{ outline:none; }
+.composer-tools{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:16px;}
+.tool-btn{
+  font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+  background:none; border:1px solid var(--line); color:var(--text-dim); padding:9px 16px; cursor:pointer;
+}
+.tool-btn:hover{ border-color:var(--gold); color:var(--text); }
+.tool-btn.recording{ border-color:var(--wine); color:var(--wine); }
+.file-label{ font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-dim); cursor:pointer; border:1px solid var(--line); padding:9px 16px; }
+.file-label:hover{ border-color:var(--gold); color:var(--text); }
+.attach-preview{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+.attach-thumb{ position:relative; width:56px; height:56px; }
+.attach-thumb img{ width:100%; height:100%; object-fit:cover; border:1px solid var(--line); }
+.attach-thumb .rm{ position:absolute; top:-6px; right:-6px; width:16px;height:16px; background:var(--ink); border:1px solid var(--line); border-radius:50%; font-size:9px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-dim);}
+.storage-note{ font-size:11px; color:var(--text-dim); font-style:italic; margin-top:14px; line-height:1.6; }
+
+.entry{
+  border-top:1px solid var(--line);
+  padding:22px 0;
+}
+.entry .entry-date{ font-size:10.5px; letter-spacing:0.1em; color:var(--text-dim); text-transform:uppercase; }
+.entry .entry-text{ margin-top:10px; font-size:14.5px; line-height:1.75; white-space:pre-line; font-weight:300;}
+.entry .entry-images{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+.entry .entry-images img{ width:90px; height:90px; object-fit:cover; border:1px solid var(--line); cursor:pointer; }
+.entry audio{ margin-top:12px; width:100%; max-width:340px; }
+.entry .entry-remove{ font-size:11px; color:var(--text-dim); cursor:pointer; margin-top:10px; display:inline-block; }
+.entry .entry-remove:hover{ color:var(--wine); }
+.lock-btn{
+  font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+  background:none; border:1px solid var(--line); color:var(--text-dim); padding:9px 16px; cursor:pointer;
+  float:right;
+}
+.lock-btn:hover{ border-color:var(--gold); color:var(--text); }
+
+/* ---------------- Thoughts ---------------- */
+.thought{
+  border-top:1px solid var(--line);
+  padding:22px 0;
+  display:grid; grid-template-columns:50px 1fr; gap:16px;
+}
+.thought .t-num{ font-family:var(--font-serif); font-size:18px; color:var(--text-dim); }
+.thought .t-text{ font-family:var(--font-serif); font-style:italic; font-size:21px; line-height:1.4; color:var(--text); font-weight:400;}
+.thought .t-date{ font-size:10.5px; color:var(--text-dim); margin-top:8px; letter-spacing:0.1em; text-transform:uppercase;}
+
+footer{
+  text-align:center;
+  font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase;
+  color:var(--text-dim); padding:40px 20px 60px;
+  border-top:1px solid var(--line);
+}
+
+@media(max-width:640px){
+  .field-row{ grid-template-columns:1fr; gap:3px; }
+  nav.tabs{ overflow-x:auto; flex-wrap:nowrap; gap:20px; }
+  .tab{ flex:0 0 auto; }
+  .pr-row{ grid-template-columns:1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="splash" onclick="hideSplash()">
+  <div class="tap-hint">tap anywhere to enter</div>
+</div>
+
+<header>
+  <div class="wordmark" onclick="showSplash()">sam<span>a personal record</span></div>
+</header>
+
+<nav class="tabs" id="tabNav"></nav>
+
+<main id="mainStage"></main>
+
+<footer>last updated <span id="buildDate"></span></footer>
+
+<script>
+/* ============================================================
+   EDIT ME — everything Sam needs to personalize lives here.
+   ============================================================ */
+const DATA = {
+  name: "Sam",
+  journalPassword: "charles2021",
+
+  charles: {
+    legal: {
+      name: "Charles Villavicencio",
+      birthday: "October 15, 2021",
+      microchip: "933012400168252",
+      address: "1289 Hornby St. / 701-289 Drake St."
+    },
+    care: [
+      { label: "Nail trims", value: "Exclusively with Victoria at Barking Babies." },
+      { label: "Teeth / incisors", value: "Do not brush the incisors — dental fragility. Ask the vet for the safe method for the rest." },
+      { label: "Feeding schedule", value: "[fill in]", placeholder:true },
+      { label: "Walks", value: "[fill in]", placeholder:true },
+      { label: "Medications / supplements", value: "[fill in if any]", placeholder:true }
+    ],
+    vet: {
+      clinic: "Yaletown Pet Hospital",
+      phone: "(604) 682-7389",
+      emergencyClinic: "[fill in]",
+      emergencyPhone: "[fill in]"
+    },
+    insurance: {
+      provider: "Fetch Pet Insurance",
+      policyNumber: "DOG0860430-01",
+      annualPremium: "$525.24",
+      deductible: "$300",
+      reimbursement: "80%",
+      annualLimit: "$5,000",
+      startDate: "May 23, 2026",
+      renewalDate: "May 23, 2027",
+      portalLogin: "samanthamaestudios@gmail.com",
+      claimsMethod: "Submit via the Fetch app within 90 days of the visit."
+    }
+  },
+
+  aboutMe: [
+    { label: "Shoe size", value: "[fill in]", placeholder:true },
+    { label: "Ring size", value: "[fill in]", placeholder:true },
+    { label: "Clothing sizes", value: "[fill in]", placeholder:true },
+    { label: "Nail colour I get", value: "[fill in]", placeholder:true },
+    { label: "Favourite flowers", value: "[fill in]", placeholder:true },
+    { label: "Coffee / tea order", value: "[fill in]", placeholder:true },
+    { label: "Go-to snack", value: "[fill in]", placeholder:true },
+    { label: "Perfume / skincare staples", value: "[fill in]", placeholder:true },
+    { label: "Allergies / can't-haves", value: "[fill in]", placeholder:true },
+    { label: "In case of emergency", value: "[fill in]", placeholder:true }
+  ],
+
+  wishlist: [
+    { id:"w1", title:"Loewe Amazona — vintage burgundy", description:"", link:"", img:"assets/loewe_amazona.png" },
+    { id:"w2", title:"Balenciaga City bag — burgundy", description:"", link:"", img:"assets/balenciaga_burgundy.png" },
+    { id:"w3", title:"Balenciaga City bag — blue", description:"", link:"", img:"assets/balenciaga_blue.png" },
+    { id:"w4", title:"Coperni boots", description:"size 38 or 8", link:"", img:"assets/coperni_boots.png" },
+    { id:"w5", title:"Chanel Caviar double flap", description:"blue", link:"", img:"assets/chanel_flap.png" },
+    { id:"w6", title:"Le Febour No. 03 — everything bag", description:"dark brown · $490 · waitlist/special access only", link:"", img:"assets/le_febour_bag.png" },
+    { id:"w7", title:"Steff Eleoff — teardrop tech ring", description:"925 sterling silver + diamond · $509", link:"", img:"assets/steff_eleoff_ring.png" },
+    { id:"w8", title:"Coperni headband", description:"", link:"", img:"assets/coperni_headband.png" },
+    { id:"w9", title:"Meshki — Linh Slinky High Neck Gathered Top", description:"mahogany · xxs", link:"", img:"assets/meshki_top.png" },
+    { id:"w10", title:"Meshki — Blanca Stretch Crepe Capri Pants", description:"mahogany · xxs", link:"", img:"assets/meshki_capri.png" },
+    { id:"w11", title:"Meshki — Frost Mini Bikini + Abra Apex Bikini Top", description:"white textured fabric · xxs", link:"", img:"assets/meshki_bikini.png" },
+    { id:"w12", title:"Navy textured midi dress", description:"still need: denim shorts, white shorts, capris, burgundy Havaiana flip flops", link:"", img:"assets/navy_dress.png" },
+    { id:"w13", title:"Good Riddance — LP", description:"clear vinyl or blue vinyl", link:"", img:"assets/good_riddance_lp.png" },
+    { id:"w14", title:"Paul Simon — Greatest Hits, Etc. LP", description:"", link:"", img:"assets/paul_simon_lp.png" },
+    { id:"w15", title:"evermore — LP", description:"translucent green, solid green, or red", link:"", img:"assets/evermore_lp.png" },
+    { id:"w16", title:"The Tortured Poets Department — anthology LP", description:"marbled translucent", link:"", img:"assets/ttpd_anthology_lp.png" },
+    { id:"w17", title:"The New Abnormal — The Strokes LP", description:"", link:"", img:"assets/new_abnormal_lp.png" },
+    { id:"w18", title:"Killers — Direct Hits LP", description:"", link:"", img:"assets/killers_direct_hits_lp.png" },
+    { id:"w19", title:"The Royal Tenenbaums — soundtrack LP", description:"red & pink vinyl", link:"", img:"assets/royal_tenenbaums_lp.png" },
+    { id:"w20", title:"Brandon Flowers — Flamingo LP", description:"black vinyl", link:"", img:"assets/flamingo_lp.png" },
+    { id:"w21", title:"The Killers — Sam's Town LP", description:"black vinyl", link:"", img:"assets/sams_town_lp.png" },
+    { id:"w22", title:"Geese — Getting Killed LP", description:"red vinyl", link:"", img:"assets/geese_lp.png" },
+    { id:"w23", title:"Melanie Martinez — LP", description:"blue vinyl variant", link:"", img:"assets/ml_lp.png" },
+    { id:"w24", title:"ABBA Gold — Greatest Hits LP", description:"black vinyl", link:"", img:"assets/abba_gold_lp.png" }
+  ],
+
+  interiors: [
+    { id:"i1", title:"Cream boucle sectional", description:"", link:"", img:"assets/int_cream_sofa.png" },
+    { id:"i2", title:"Zebra print ottoman", description:"", link:"", img:"assets/int_zebra_ottoman.png" },
+    { id:"i3", title:"Blue velvet accent chair", description:"", link:"", img:"assets/int_blue_velvet_chair.png" },
+    { id:"i4", title:"Horse and rider painting", description:"red ground", link:"", img:"assets/int_horse_painting.png" },
+    { id:"i5", title:"Walnut sideboard / console", description:"", link:"", img:"assets/int_walnut_console.png" },
+    { id:"i6", title:"Antiqued mirror panel", description:"", link:"", img:"assets/int_antique_mirror.png" },
+    { id:"i7", title:"Console table with ceramic lamp", description:"", link:"", img:"assets/int_console_lamp.png" },
+    { id:"i8", title:"Woven lattice cabinet", description:"", link:"", img:"assets/int_lattice_cabinet.png" }
+  ],
+
+  recipes: [
+    { id:"r1", title:"add your first recipe", tag:"staple", body:"add below — title, a short note, and the recipe body." }
+  ],
+
+  thoughts: [
+    { id:"t1", text:"this page is listening.", date:"" }
+  ],
+
+  health: {
+    weight: "", calorieGoal: "", stepsGoal: "", goalsNote: ""
+  },
+  prs: [
+    { id:"p1", exercise:"", result:"", date:"" }
+  ]
+};
+
+/* ============================================================
+   Rendering + storage engine.
+   ============================================================ */
+const K = { wishlist:"sam_wishlist_v2", interiors:"sam_interiors_v2", recipes:"sam_recipes_v2", thoughts:"sam_thoughts_v2",
+            journal:"sam_journal_v2", unlocked:"sam_journal_unlocked", health:"sam_health_v2", prs:"sam_prs_v2" };
+
+function loadList(key, fallback){
+  try{ const raw = localStorage.getItem(key); if(raw){ const p = JSON.parse(raw); if(Array.isArray(p) && p.length) return p; } }catch(e){}
+  return fallback;
+}
+function loadObj(key, fallback){
+  try{ const raw = localStorage.getItem(key); if(raw) return JSON.parse(raw); }catch(e){}
+  return fallback;
+}
+function saveList(key, list){ try{ localStorage.setItem(key, JSON.stringify(list)); }catch(e){ alert('Could not save — your browser storage may be full (this happens with a lot of photos/voice notes).'); } }
+function saveObj(key, obj){ try{ localStorage.setItem(key, JSON.stringify(obj)); }catch(e){ alert('Could not save — your browser storage may be full.'); } }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+let wishlist = loadList(K.wishlist, DATA.wishlist);
+let interiors = loadList(K.interiors, DATA.interiors);
+let recipes = loadList(K.recipes, DATA.recipes);
+let thoughts = loadList(K.thoughts, DATA.thoughts);
+let journalEntries = loadList(K.journal, []);
+let health = loadObj(K.health, DATA.health);
+let prs = loadList(K.prs, DATA.prs);
+
+const TABS = [
+  { id:"home", label:"Home" },
+  { id:"charles", label:"Charles" },
+  { id:"me", label:"About Me" },
+  { id:"health", label:"Health" },
+  { id:"wishlist", label:"Wishlist" },
+  { id:"interiors", label:"Interiors" },
+  { id:"recipes", label:"Recipes" },
+  { id:"journal", label:"Journal" },
+  { id:"thoughts", label:"Thoughts" }
+];
+
+function todayStr(){ return new Date().toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' }); }
+
+function renderNav(activeId){
+  const nav = document.getElementById('tabNav');
+  nav.innerHTML = TABS.map(t => '<button class="tab '+(t.id===activeId?'active':'')+'" data-tab="'+t.id+'">'+t.label+'</button>').join('');
+  nav.querySelectorAll('.tab').forEach(btn=> btn.addEventListener('click', ()=> showPanel(btn.dataset.tab)));
+}
+
+function fieldRows(rows){
+  return rows.map(r=>'<div class="field-row"><div class="field-label">'+r.label+'</div><div class="field-value '+(r.placeholder?'placeholder':'')+'">'+r.value+'</div></div>').join('');
+}
+
+function panelHome(){
+  return '' +
+    '<div class="hero">' +
+      '<div class="eyebrow">a personal record</div>' +
+      '<h2>everything, in one place.</h2>' +
+      '<p>Care notes, the essentials, what I want, what I\'m working toward — kept somewhere quieter than a phone full of screenshots.</p>' +
+    '</div>' +
+    '<div class="grid-3">' +
+      '<div class="doorway" data-tab="charles"><div class="num">01</div><h3>Charles</h3><p>Care notes, vet and insurance details.</p></div>' +
+      '<div class="doorway" data-tab="me"><div class="num">02</div><h3>About Me</h3><p>Sizes, staples, the handoff doc.</p></div>' +
+      '<div class="doorway" data-tab="health"><div class="num">03</div><h3>Health</h3><p>Goals, numbers, personal records.</p></div>' +
+      '<div class="doorway" data-tab="wishlist"><div class="num">04</div><h3>Wishlist</h3><p>Things I want, with a photo and a note.</p></div>' +
+      '<div class="doorway" data-tab="interiors"><div class="num">05</div><h3>Interiors</h3><p>Home design inspiration.</p></div>' +
+      '<div class="doorway" data-tab="recipes"><div class="num">06</div><h3>Recipes</h3><p>What\'s worth cooking again.</p></div>' +
+      '<div class="doorway" data-tab="journal"><div class="num">07</div><h3>Journal</h3><p>Private. Locked.</p></div>' +
+      '<div class="doorway" data-tab="thoughts"><div class="num">08</div><h3>Thoughts</h3><p>A running collection.</p></div>' +
+    '</div>';
+}
+
+function panelCharles(){
+  const c = DATA.charles;
+  return '' +
+    '<div class="eyebrow">01</div>' +
+    '<h1 class="page-title">Charles</h1>' +
+    '<p class="page-sub">Everything anyone would need to know, if they were on dog duty.</p>' +
+    '<div class="note-line">Nail trims are with Victoria at Barking Babies only. The incisors are not to be brushed.</div>' +
+    '<div class="id-card"><div class="id-head"><span>Daily care</span><span>Charles Villavicencio</span></div><div class="id-body">'+fieldRows(c.care)+'</div></div>' +
+    '<div class="id-card"><div class="id-head"><span>Vet on file</span></div><div class="id-body">'+fieldRows([
+      { label:"Clinic", value:c.vet.clinic },
+      { label:"Phone", value:c.vet.phone },
+      { label:"Emergency clinic", value:c.vet.emergencyClinic, placeholder:c.vet.emergencyClinic.startsWith('[') },
+      { label:"Emergency phone", value:c.vet.emergencyPhone, placeholder:c.vet.emergencyPhone.startsWith('[') }
+    ])+'</div></div>' +
+    '<div class="id-card"><div class="id-head"><span>Insurance — Fetch Pet Insurance</span><span>'+c.insurance.policyNumber+'</span></div><div class="id-body">'+fieldRows([
+      { label:"Annual premium", value:c.insurance.annualPremium },
+      { label:"Deductible", value:c.insurance.deductible },
+      { label:"Reimbursement", value:c.insurance.reimbursement },
+      { label:"Annual coverage limit", value:c.insurance.annualLimit },
+      { label:"Policy start", value:c.insurance.startDate },
+      { label:"Renewal date", value:c.insurance.renewalDate },
+      { label:"Portal login", value:c.insurance.portalLogin },
+      { label:"Claims", value:c.insurance.claimsMethod }
+    ])+'</div></div>' +
+    '<div class="id-card"><div class="id-head"><span>Legal / ID</span></div><div class="id-body">'+fieldRows([
+      { label:"Birthday", value:c.legal.birthday },
+      { label:"Microchip", value:c.legal.microchip },
+      { label:"Address", value:c.legal.address }
+    ])+'</div></div>';
+}
+
+function panelMe(){
+  return '' +
+    '<div class="eyebrow">02</div>' +
+    '<h1 class="page-title">about me</h1>' +
+    '<p class="page-sub">The handoff doc — everything worth knowing, in one glance.</p>' +
+    '<div class="id-card"><div class="id-head"><span>The essentials</span><span>'+DATA.name+'</span></div><div class="id-body">'+fieldRows(DATA.aboutMe)+'</div></div>';
+}
+
+function panelHealth(){
+  return '' +
+    '<div class="eyebrow">03</div>' +
+    '<h1 class="page-title">health</h1>' +
+    '<p class="page-sub">Numbers, goals, and the records worth keeping track of.</p>' +
+    '<div class="stat-grid">' +
+      '<div class="stat-card"><div class="stat-label">Weight</div><input type="text" id="h-weight" value="'+esc(health.weight)+'" placeholder="—" onchange="saveHealth()"><div class="stat-unit">lbs / kg</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Calorie goal</div><input type="text" id="h-cal" value="'+esc(health.calorieGoal)+'" placeholder="—" onchange="saveHealth()"><div class="stat-unit">per day</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Steps goal</div><input type="text" id="h-steps" value="'+esc(health.stepsGoal)+'" placeholder="—" onchange="saveHealth()"><div class="stat-unit">per day</div></div>' +
+    '</div>' +
+    '<div class="goals-box"><div class="eyebrow">general goals</div><textarea id="h-goals" placeholder="What you\'re working toward right now..." onchange="saveHealth()">'+esc(health.goalsNote)+'</textarea></div>' +
+    '<div class="eyebrow">personal records</div>' +
+    '<div class="add-form">' +
+      '<div class="row">' +
+        '<div><label>Exercise / lift</label><input type="text" id="pr-exercise" placeholder="e.g. deadlift"></div>' +
+        '<div><label>Result</label><input type="text" id="pr-result" placeholder="e.g. 185 lbs x 3"></div>' +
+      '</div>' +
+      '<button class="btn" onclick="addPR()">Add record</button>' +
+    '</div>' +
+    renderPRs();
+}
+
+function renderPRs(){
+  const rows = prs.filter(p=>p.exercise).slice().reverse().map(p=>
+    '<div class="pr-row"><div>'+esc(p.exercise)+'</div><div>'+esc(p.result)+'</div><div class="pr-date">'+esc(p.date)+'</div><div class="pr-remove" onclick="removeItem(\'prs\',\''+p.id+'\')">remove</div></div>'
+  ).join('');
+  return rows || '<p style="color:var(--text-dim);font-size:13px;">No records yet.</p>';
+}
+
+function pinCard(item, kind){
+  const imgStyle = item.img ? "background-image:url('"+item.img+"')" : "";
+  return '' +
+    '<div class="pin">' +
+      '<div class="pin-remove" onclick="removeItem(\''+kind+'\',\''+item.id+'\')">&times;</div>' +
+      '<div class="pin-img" style="'+imgStyle+'">'+(item.img?'':'no photo')+'</div>' +
+      '<div class="pin-body">' +
+        '<div class="pin-title">'+esc(item.title)+'</div>' +
+        (item.description?'<div class="pin-desc">'+esc(item.description)+'</div>':'') +
+        (item.link?'<a class="pin-link" href="'+item.link+'" target="_blank" rel="noopener">view →</a>':'') +
+      '</div>' +
+    '</div>';
+}
+
+function pinBoardForm(kind){
+  return '' +
+    '<div class="add-form">' +
+      '<div class="eyebrow">pin something new</div>' +
+      '<div class="row">' +
+        '<div><label>Title</label><input type="text" id="'+kind+'-title" placeholder="What is it?"></div>' +
+        '<div><label>Link</label><input type="url" id="'+kind+'-link" placeholder="optional"></div>' +
+      '</div>' +
+      '<div class="row">' +
+        '<div><label>Photo</label><input type="file" accept="image/*" id="'+kind+'-file" onchange="previewFile(\''+kind+'\')"><img class="thumb-preview" id="'+kind+'-thumb"></div>' +
+        '<div><label>Description</label><textarea id="'+kind+'-desc" placeholder="A short note"></textarea></div>' +
+      '</div>' +
+      '<button class="btn" onclick="addPin(\''+kind+'\')">Pin it</button>' +
+    '</div>';
+}
+
+function panelWishlist(){
+  return '' +
+    '<div class="eyebrow">04</div><h1 class="page-title">wishlist</h1>' +
+    '<p class="page-sub">Pinned things, with a photo and a little context.</p>' +
+    pinBoardForm('wishlist') +
+    '<div class="pingrid">'+wishlist.map(w=>pinCard(w,'wishlist')).join('')+'</div>';
+}
+
+function panelInteriors(){
+  return '' +
+    '<div class="eyebrow">05</div><h1 class="page-title">interiors</h1>' +
+    '<p class="page-sub">Home design inspiration, kept in one place.</p>' +
+    pinBoardForm('interiors') +
+    '<div class="pingrid">'+interiors.map(w=>pinCard(w,'interiors')).join('')+'</div>';
+}
+
+function panelRecipes(){
+  const cards = recipes.map(r=>'<div class="recipe-card"><div class="rc-head"><div class="num">recipe</div><h3>'+esc(r.title)+'</h3></div><div class="rc-body">'+esc(r.body)+(r.tag?'<div><span class="rc-tag">'+esc(r.tag)+'</span></div>':'')+'</div></div>').join('');
+  return '' +
+    '<div class="eyebrow">06</div><h1 class="page-title">recipes</h1>' +
+    '<p class="page-sub">The ones worth keeping.</p>' +
+    '<div class="add-form"><div class="eyebrow">add a recipe</div>' +
+      '<div class="row"><div><label>Name</label><input type="text" id="rc-title"></div><div><label>Tag</label><input type="text" id="rc-tag" placeholder="e.g. staple, dinner party"></div></div>' +
+      '<label>Ingredients + steps</label><textarea id="rc-body"></textarea>' +
+      '<button class="btn" onclick="addRecipe()" style="margin-top:14px;">Save recipe</button>' +
+    '</div>' +
+    '<div class="recipe-grid">'+cards+'</div>';
+}
+
+function panelJournal(){
+  const unlocked = sessionStorage.getItem(K.unlocked) === '1';
+  if(!unlocked){
+    return '' +
+      '<div class="eyebrow">07</div><h1 class="page-title">journal</h1>' +
+      '<p class="page-sub">Private.</p>' +
+      '<div class="lock-screen"><h2>enter the password</h2><p>A soft lock, not a vault — enough for privacy.</p>' +
+      '<input type="password" id="journal-pw" placeholder="•••••••••"><button class="btn" style="width:100%;" onclick="tryUnlock()">Unlock</button>' +
+      '<div class="err" id="journal-err"></div></div>';
+  }
+  const entries = journalEntries.slice().reverse().map(e=>{
+    const imgs = (e.images&&e.images.length) ? '<div class="entry-images">'+e.images.map(i=>'<img src="'+i+'" onclick="window.open(this.src)">').join('')+'</div>' : '';
+    const audio = e.audio ? '<audio controls src="'+e.audio+'"></audio>' : '';
+    return '<div class="entry"><div class="entry-date">'+e.date+'</div><div class="entry-text">'+esc(e.text)+'</div>'+imgs+audio+'<div class="entry-remove" onclick="removeItem(\'journal\',\''+e.id+'\')">remove entry</div></div>';
+  }).join('') || '<p style="color:var(--text-dim);font-size:13px;">No entries yet.</p>';
+
+  return '' +
+    '<div class="eyebrow">07</div><button class="lock-btn" onclick="lockJournal()">Lock</button>' +
+    '<h1 class="page-title">journal</h1><p class="page-sub">Unlocked for this session.</p>' +
+    '<div class="journal-composer">' +
+      '<textarea id="jr-text" placeholder="What\'s on your mind..."></textarea>' +
+      '<div class="composer-tools">' +
+        '<label class="file-label">+ photo<input type="file" accept="image/*" multiple style="display:none" onchange="addPendingImages(this)"></label>' +
+        '<button class="tool-btn" id="rec-btn" onclick="toggleRecording()">● record voice note</button>' +
+      '</div>' +
+      '<div class="attach-preview" id="attach-preview"></div>' +
+      '<button class="btn" onclick="addJournal()">Write it down</button>' +
+      '<div class="storage-note">Photos and voice notes are saved right in this browser. That works well day to day, but heavy files can eventually bump against the browser storage limit — say the word if you want this moved to a proper backend later.</div>' +
+    '</div>' +
+    entries;
+}
+
+function panelThoughts(){
+  const items = thoughts.filter(t=>t.text).slice().reverse().map((t,i)=>
+    '<div class="thought"><div class="t-num">'+String(thoughts.length-i).padStart(2,'0')+'</div><div><div class="t-text">'+esc(t.text)+'</div>'+(t.date?'<div class="t-date">'+t.date+'</div>':'')+'</div></div>'
+  ).join('');
+  return '' +
+    '<div class="eyebrow">08</div><h1 class="page-title">thoughts</h1>' +
+    '<p class="page-sub">A running collection.</p>' +
+    '<div class="add-form"><div class="eyebrow">add a thought</div><textarea id="th-text"></textarea><button class="btn" onclick="addThought()" style="margin-top:14px;">Add</button></div>' +
+    items;
+}
+
+const PANEL_RENDERERS = { home:panelHome, charles:panelCharles, me:panelMe, health:panelHealth, wishlist:panelWishlist, interiors:panelInteriors, recipes:panelRecipes, journal:panelJournal, thoughts:panelThoughts };
+
+function esc(s){ return (s||'').toString().replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+function showPanel(id){
+  renderNav(id);
+  const stage = document.getElementById('mainStage');
+  stage.innerHTML = '<div class="panel active">'+PANEL_RENDERERS[id]()+'</div>';
+  stage.querySelectorAll('.doorway[data-tab]').forEach(el=> el.addEventListener('click', ()=> showPanel(el.dataset.tab)));
+  window.scrollTo({top:0, behavior:'smooth'});
+  history.replaceState(null,'','#'+id);
+}
+
+/* ---- generic remove ---- */
+function removeItem(kind, id){
+  if(kind==='wishlist'){ wishlist = wishlist.filter(x=>x.id!==id); saveList(K.wishlist, wishlist); showPanel('wishlist'); }
+  if(kind==='interiors'){ interiors = interiors.filter(x=>x.id!==id); saveList(K.interiors, interiors); showPanel('interiors'); }
+  if(kind==='prs'){ prs = prs.filter(x=>x.id!==id); saveList(K.prs, prs); showPanel('health'); }
+  if(kind==='journal'){ journalEntries = journalEntries.filter(x=>x.id!==id); saveList(K.journal, journalEntries); showPanel('journal'); }
+}
+
+/* ---- file helpers ---- */
+function fileToDataURL(file){
+  return new Promise((res,rej)=>{ const r = new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+}
+function blobToDataURL(blob){ return fileToDataURL(blob); }
+
+let pendingThumb = { wishlist:null, interiors:null };
+async function previewFile(kind){
+  const input = document.getElementById(kind+'-file');
+  const thumb = document.getElementById(kind+'-thumb');
+  if(input.files && input.files[0]){
+    const durl = await fileToDataURL(input.files[0]);
+    pendingThumb[kind] = durl;
+    thumb.src = durl; thumb.style.display='block';
+  }
+}
+
+async function addPin(kind){
+  const title = document.getElementById(kind+'-title').value.trim();
+  if(!title) return;
+  const item = {
+    id: uid(), title,
+    link: document.getElementById(kind+'-link').value.trim(),
+    description: document.getElementById(kind+'-desc').value.trim(),
+    img: pendingThumb[kind] || ""
+  };
+  pendingThumb[kind] = null;
+  if(kind==='wishlist'){ wishlist.push(item); saveList(K.wishlist, wishlist); }
+  else { interiors.push(item); saveList(K.interiors, interiors); }
+  showPanel(kind);
+}
+
+function addRecipe(){
+  const title = document.getElementById('rc-title').value.trim();
+  const body = document.getElementById('rc-body').value.trim();
+  if(!title || !body) return;
+  if(recipes.length===1 && recipes[0].title==="add your first recipe") recipes = [];
+  recipes.push({ id:uid(), title, tag: document.getElementById('rc-tag').value.trim(), body });
+  saveList(K.recipes, recipes);
+  showPanel('recipes');
+}
+
+function addThought(){
+  const text = document.getElementById('th-text').value.trim();
+  if(!text) return;
+  if(thoughts.length===1 && thoughts[0].text==="this page is listening.") thoughts = [];
+  thoughts.push({ id:uid(), text, date: todayStr() });
+  saveList(K.thoughts, thoughts);
+  showPanel('thoughts');
+}
+
+/* ---- health ---- */
+function saveHealth(){
+  health = {
+    weight: document.getElementById('h-weight').value,
+    calorieGoal: document.getElementById('h-cal').value,
+    stepsGoal: document.getElementById('h-steps').value,
+    goalsNote: document.getElementById('h-goals').value
+  };
+  saveObj(K.health, health);
+}
+function addPR(){
+  const exercise = document.getElementById('pr-exercise').value.trim();
+  const result = document.getElementById('pr-result').value.trim();
+  if(!exercise || !result) return;
+  if(prs.length===1 && !prs[0].exercise) prs = [];
+  prs.push({ id:uid(), exercise, result, date: todayStr() });
+  saveList(K.prs, prs);
+  showPanel('health');
+}
+
+/* ---- journal: pending attachments ---- */
+let pendingImages = [];
+let pendingAudioDataURL = null;
+let mediaRecorder, audioChunks = [], mediaStream = null;
+
+function renderPendingAttachments(){
+  const box = document.getElementById('attach-preview');
+  if(!box) return;
+  let html = pendingImages.map((src,i)=>'<div class="attach-thumb"><img src="'+src+'"><div class="rm" onclick="removePendingImage('+i+')">&times;</div></div>').join('');
+  if(pendingAudioDataURL){ html += '<audio controls src="'+pendingAudioDataURL+'" style="height:40px;"></audio>'; }
+  box.innerHTML = html;
+}
+function removePendingImage(i){ pendingImages.splice(i,1); renderPendingAttachments(); }
+
+async function addPendingImages(input){
+  for(const f of input.files){ pendingImages.push(await fileToDataURL(f)); }
+  input.value = '';
+  renderPendingAttachments();
+}
+
+async function toggleRecording(){
+  const btn = document.getElementById('rec-btn');
+  if(mediaRecorder && mediaRecorder.state==='recording'){ mediaRecorder.stop(); return; }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    alert('Voice notes need microphone access, which this browser does not support here.');
+    return;
+  }
+  try{
+    mediaStream = await navigator.mediaDevices.getUserMedia({audio:true});
+    mediaRecorder = new MediaRecorder(mediaStream);
+    audioChunks = [];
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    mediaRecorder.onstop = async ()=>{
+      const blob = new Blob(audioChunks, {type:'audio/webm'});
+      pendingAudioDataURL = await blobToDataURL(blob);
+      renderPendingAttachments();
+      mediaStream.getTracks().forEach(t=>t.stop());
+      btn.textContent = '● record voice note';
+      btn.classList.remove('recording');
+    };
+    mediaRecorder.start();
+    btn.textContent = '■ stop recording';
+    btn.classList.add('recording');
+  }catch(err){
+    alert('Microphone access was blocked — check this browser\'s site permissions to record a voice note.');
+  }
+}
+
+function addJournal(){
+  const text = document.getElementById('jr-text').value.trim();
+  if(!text && pendingImages.length===0 && !pendingAudioDataURL) return;
+  journalEntries.push({ id:uid(), text, date: todayStr(), images: pendingImages.slice(), audio: pendingAudioDataURL });
+  saveList(K.journal, journalEntries);
+  pendingImages = []; pendingAudioDataURL = null;
+  showPanel('journal');
+}
+
+function tryUnlock(){
+  const val = document.getElementById('journal-pw').value;
+  if(val === DATA.journalPassword){ sessionStorage.setItem(K.unlocked,'1'); showPanel('journal'); }
+  else{ document.getElementById('journal-err').textContent = 'wrong password — try again'; }
+}
+function lockJournal(){ sessionStorage.removeItem(K.unlocked); showPanel('journal'); }
+
+document.getElementById('buildDate').textContent = todayStr();
+const startTab = (location.hash||'').replace('#','') || 'home';
+showPanel(TABS.some(t=>t.id===startTab) ? startTab : 'home');
+
+/* ---- splash ---- */
+const SPLASH_KEY = 'sam_entered';
+function hideSplash(){ sessionStorage.setItem(SPLASH_KEY,'1'); document.getElementById('splash').classList.add('hidden'); }
+function showSplash(){ document.getElementById('splash').classList.remove('hidden'); }
+if(sessionStorage.getItem(SPLASH_KEY) === '1'){ document.getElementById('splash').classList.add('hidden'); }
+</script>
+</body>
+</html>
